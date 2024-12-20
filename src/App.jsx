@@ -4,25 +4,25 @@ import products from "./api/products";
 import ProductListFilters from "./components/ProductListFilters";
 import { useState } from "react";
 
-const fetchProducts = async ({ category, maxPrice, search }) => {
+const fetchProducts = async ({ category, maxPrice, name }) => {
   await new Promise((resolve) => setTimeout(resolve, 1000));
   let filteredProducts = products;
 
-  // if (options?.category) {
-  //   filteredProducts = filteredProducts.filter((product) => {
-  //     return product.category === options.category;
-  //   });
-  // }
-
-  // if (options?.maxPrice) {
-  //   filteredProducts = filteredProducts.filter((product) => {
-  //     return product.price <= (options.maxPrice);
-  //   });
-  // }
-
-  if (search) {
+  if (category) {
     filteredProducts = filteredProducts.filter((product) => {
-      return product.name.toLowerCase().includes(search.toLowerCase());
+      return product.category === category;
+    });
+  }
+
+  if (maxPrice) {
+    filteredProducts = filteredProducts.filter((product) => {
+      return product.price <= maxPrice;
+    });
+  }
+
+  if (name) {
+    filteredProducts = filteredProducts.filter((product) => {
+      return product.name.toLowerCase().includes(name.toLowerCase());
     });
   }
 
@@ -30,17 +30,18 @@ const fetchProducts = async ({ category, maxPrice, search }) => {
 };
 // new custom component just for the filters, send data of filters back to the App component
 function App() {
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("");
-  const [maxPrice, setMaxPrice] = useState(-1);
+  const [name, setName] = useState(undefined);
+  const [category, setCategory] = useState(undefined);
+  const [maxPrice, setMaxPrice] = useState(undefined);
   const { data: products, isFetching } = useQuery({
-    // queryKey: ["products", { category, maxPrice, search }],
-    queryKey: ["products", { search }],
-    queryFn: () => fetchProducts({ search }),
+    queryKey: ["products", { name, category, maxPrice }],
+    queryFn: () => fetchProducts({ name, category, maxPrice }),
   });
-  const handleChange = ({ search }) => {
+  const handleChange = ({ name, category, maxPrice }) => {
     console.debug("fetch");
-    setSearch(search);
+    setName(name);
+    setCategory(category);
+    setMaxPrice(maxPrice);
   };
   return (
     <div className="flex flex-col gap-2">
